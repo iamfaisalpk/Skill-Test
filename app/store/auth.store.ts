@@ -1,27 +1,31 @@
 import { create } from "zustand";
-import Cookies from "js-cookie";
 
 interface AuthState {
     token: string | null;
-    user: {
-        name?: string;
-        phone?: string;
-    } | null;
-    login: (token: string, user?: AuthState["user"]) => void;
+    isAuthenticated: boolean;
+    login: (token: string) => void;
     logout: () => void;
+    initAuth: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
     token: null,
-    user: null,
+    isAuthenticated: false,
 
-    login: (token, user) => {
-        Cookies.set("access_token", token);
-        set({ token, user });
+    login: (token) => {
+        localStorage.setItem("access_token", token);
+        set({ token, isAuthenticated: true });
     },
 
     logout: () => {
-        Cookies.remove("access_token");
-        set({ token: null, user: null });
+        localStorage.removeItem("access_token");
+        set({ token: null, isAuthenticated: false });
+    },
+
+    initAuth: () => {
+        const token = localStorage.getItem("access_token");
+        if (token) {
+            set({ token, isAuthenticated: true });
+        }
     },
 }));
