@@ -1,36 +1,168 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+🚀 Skill Test – OTP Based E-Commerce Flow (Next.js)
+📌 Project Overview
 
-## Getting Started
+This project is a Next.js (App Router) based web application implementing an OTP-based authentication flow along with a product purchase and order management system.
 
-First, run the development server:
+The application demonstrates:
 
-```bash
+Phone number based login using OTP
+
+Automatic user registration for new users
+
+JWT-based authentication
+
+Protected routes
+
+Product listing and purchase flow
+
+User order history
+
+📌 Note: Static OTP generation is used for testing purposes as mentioned in the task requirements.
+
+🌍 Live Demo
+
+🔗 Deployed Application:
+👉 https://skill-test-navy.vercel.app/
+
+🛠 Tech Stack
+
+Frontend
+
+Next.js 16 (App Router)
+
+React 19
+
+TypeScript
+
+Tailwind CSS
+
+State Management
+
+Zustand
+
+Networking
+
+Axios
+
+UI & UX
+
+React Phone Number Input
+
+React Toastify (notifications)
+
+Lucide Icons
+
+GSAP (animations)
+
+Authentication
+
+JWT (stored in localStorage)
+
+🔐 Authentication Flow
+
+User enters phone number
+
+A static OTP is generated and shown (for testing)
+
+User enters OTP
+
+Existing User
+
+Logged in directly
+
+New User
+
+Asked to enter name
+
+Automatically registered
+
+JWT token stored in localStorage
+
+User redirected to homepage
+
+Protected pages are accessible only after login.
+
+🧾 Features
+
+OTP-based login (phone number)
+
+Auto registration for new users
+
+JWT authentication
+
+Protected routes
+
+Product listing (SSR)
+
+Buy Now purchase flow
+
+User order history
+
+Logout functionality
+
+Responsive UI
+
+📦 API Integration
+
+The following APIs are integrated as provided:
+
+POST /api/verify/ – OTP verification
+
+POST /api/login-register/ – User registration
+
+POST /api/purchase-product/ – Buy product (JWT required)
+
+GET /api/user-orders/ – User order history
+
+GET /api/new-products/ – Latest products
+
+⚙️ Setup Instructions
+1️⃣ Clone the Repository
+git clone https://github.com/iamfaisalpk/Skill-Test.git
+cd Skill-Test
+
+2️⃣ Install Dependencies
+npm install
+
+3️⃣ Run Development Server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Application will run at:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+http://localhost:3000
 
-## Learn More
+🧠 Technical Decisions
 
-To learn more about Next.js, take a look at the following resources:
+Static OTP used for easier testing (no SMS service required)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Zustand chosen for lightweight and clean state management
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+App Router + SSR for better performance and SEO
 
-## Deploy on Vercel
+JWT stored in localStorage for simplicity
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Clean separation of concerns using services, hooks, and components
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+📁 Project Structure
+app/
+├── login/              # Phone + OTP login
+├── profile/            # Protected orders page
+├── order-success/      # Order confirmation
+components/
+├── auth/               # PhoneInput, OtpInput, AuthGuard
+├── product/            # Product UI components
+├── layout/             # Navbar & Footer
+hooks/
+lib/
+services/
+store/
+
+👨‍💻 Author
+
+Mohammed Faisal
+MERN Stack Developer
+
+GitHub: https://github.com/iamfaisalpk
+
+LinkedIn: https://linkedin.com/in/mohammed-faisal-a779bb2b6
