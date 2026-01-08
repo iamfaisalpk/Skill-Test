@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Image from "next/image";
@@ -13,19 +12,19 @@ interface Order {
     total_amount: number;
     original_price?: number;
     created_at: string;
-    selected_color?: "green" | "vilot " | "red" | "pink";
+    selected_color?: "green" | "vilot" | "red" | "pink";
 }
 
 const COLOR_IMAGES: Record<string, string> = {
     green: "/images/green.png",
-    vilot : "/images/vilot.png", // keeping your filename as is
+    vilot: "/images/vilot.png",
     red: "/images/red.png",
     pink: "/images/pink.png",
 };
 
 const COLOR_BG_CLASS: Record<string, string> = {
     green: "bg-lime-400",
-    vilot : "bg-purple-600",
+    vilot: "bg-purple-600",
     red: "bg-red-600",
     pink: "bg-pink-400",
 };
@@ -52,41 +51,31 @@ export default function ProfilePage() {
         const loadMyOrders = async () => {
             let myOrders: Order[] = [];
 
-            // Load local last order (most recent successful purchase)
-            const lastOrderJson = localStorage.getItem("last_order");
-            if (lastOrderJson) {
-                try {
-                    const lastOrder = JSON.parse(lastOrderJson);
-                    myOrders.push(lastOrder); // Always add, no color check needed
-                } catch (e) {
-                    console.error("Failed to parse last_order", e);
-                }
-            }
-
-            // Load orders from API
+            // Only fetch orders from API - remove localStorage logic
             try {
                 const response = await api.get("/api/user-orders/");
                 let apiOrders: Order[] = [];
+                
                 if (Array.isArray(response.data)) {
                     apiOrders = response.data;
                 } else if (response.data.orders) {
                     apiOrders = response.data.orders;
                 }
 
-                // Add API orders (skip duplicates by id)
+                // Only add orders that have selected_color
                 apiOrders.forEach((order) => {
-                    if (!myOrders.some((o) => o.id === order.id)) {
-                        myOrders.push(order); // Always add, no color check
+                    if (order.selected_color) {
+                        myOrders.push(order);
                     }
                 });
-            } catch {
-                console.log("API not available yet — showing local order only");
+            } catch (error) {
+                console.log("Failed to load orders from API:", error);
             }
 
-            // Filter out deleted orders (only for ones with id)
+            // Filter out deleted orders
             const deletedIds = getDeletedIds();
             myOrders = myOrders.filter((order) => {
-                if (!order.id) return true; // local orders without id are kept
+                if (!order.id) return true;
                 return !deletedIds.includes(order.id);
             });
 
@@ -109,15 +98,24 @@ export default function ProfilePage() {
         }).replace(",", "");
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (!orderToDelete) return;
 
+        // If order has an ID, try to delete from backend
         if (orderToDelete.id) {
-            markAsDeleted(orderToDelete.id);
+            try {
+                await api.delete(`/api/user-orders/${orderToDelete.id}/`);
+                toast.success("Order deleted successfully");
+            } catch (error) {
+                console.error("Failed to delete order from backend:", error);
+                // Still mark as deleted locally if backend fails
+                markAsDeleted(orderToDelete.id);
+                toast.success("Order removed");
+            }
         }
 
+        // Remove from local state
         setOrders((prev) => prev.filter((o) => o !== orderToDelete));
-        toast.success("Order removed");
         setOrderToDelete(null);
     };
 
@@ -139,11 +137,9 @@ export default function ProfilePage() {
                 ) : (
                     <div className="space-y-6">
                         {orders.map((order, index) => {
-                            // Fallback to green if no color
                             const color = order.selected_color || "green";
-                            const shoeImage = COLOR_IMAGES[color] || COLOR_IMAGES.green;
-                            const bgCircleClass = COLOR_BG_CLASS[color] || COLOR_BG_CLASS.green;
-
+                            const shoeImage = COLOR_IMAGES[color];
+                            const bgCircleClass = COLOR_BG_CLASS[color];
                             const key = order.id || `local-${index}-${order.product_name}`;
 
                             return (
@@ -203,7 +199,7 @@ export default function ProfilePage() {
                         <div className="mb-6 flex items-center gap-4">
                             <div className={`relative w-20 h-20 ${COLOR_BG_CLASS[orderToDelete.selected_color || "green"]} rounded-full overflow-hidden`}>
                                 <Image
-                                    src={COLOR_IMAGES[orderToDelete.selected_color || "green"] || COLOR_IMAGES.green}
+                                    src={COLOR_IMAGES[orderToDelete.selected_color || "green"]}
                                     alt={`${orderToDelete.product_name} preview`}
                                     width={150}
                                     height={150}
