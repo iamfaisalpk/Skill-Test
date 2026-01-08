@@ -45,7 +45,7 @@ export default function NameInput({ phone }: NameInputProps) {
 
                 <input
                     type="text"
-                    placeholder="Eg: John Mathew"
+                    placeholder="Enter a Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full px-5 py-4 bg-zinc-900 text-white text-base rounded-xl mb-8 focus:outline-none focus:ring-1 focus:ring-gray-600 placeholder-gray-500"
