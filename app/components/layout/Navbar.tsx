@@ -2,14 +2,18 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useAuthStore } from "../../store/auth.store";
+import { useAuthStore } from "@/app/store/auth.store";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-    const { isAuthenticated, logout } = useAuthStore();
+    const { isAuthenticated, name, logout } = useAuthStore();
+    const router = useRouter();
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
-
-    const userInitial = "G";
+    const handleLogout = () => {
+        logout();
+        router.push("/login");
+    };
 
     return (
         <nav className="w-full bg-[#161616] text-white">
@@ -30,27 +34,23 @@ export default function Navbar() {
                         </Link>
                     ) : (
                         <div className="relative">
-                            <button
+                            <div
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                                className="w-10 h-10 rounded-full bg-green-400 flex items-center justify-center font-bold text-black"
+                                className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center cursor-pointer font-bold text-black"
                             >
-                                {userInitial}
-                            </button>
+                                {name?.charAt(0).toUpperCase() || "U"}
+                            </div>
 
                             {dropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-40 bg-[#222] rounded shadow-lg py-2 z-50">
+                                <div className="absolute right-0 mt-2 w-40 bg-[#1a1a1a] text-white rounded shadow-lg z-50">
                                     <Link
                                         href="/profile"
                                         className="block px-4 py-2 hover:bg-gray-700"
-                                        onClick={() => setDropdownOpen(false)}
                                     >
                                         My Orders
                                     </Link>
                                     <button
-                                        onClick={() => {
-                                            logout();
-                                            setDropdownOpen(false);
-                                        }}
+                                        onClick={handleLogout}
                                         className="w-full text-left px-4 py-2 hover:bg-gray-700"
                                     >
                                         Logout

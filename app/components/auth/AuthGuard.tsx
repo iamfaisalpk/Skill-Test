@@ -4,21 +4,17 @@ import { useAuthStore } from "../../store/auth.store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export default function AuthGuard({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
-    const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-    const initAuth = useAuthStore((s) => s.initAuth);
+export default function AuthGuard({ children }: { children: React.ReactNode }) {
+    const { isAuthenticated } = useAuthStore();
     const router = useRouter();
 
     useEffect(() => {
-        initAuth();
         if (!isAuthenticated) {
             router.push("/login");
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, router]);
+
+    if (!isAuthenticated) return null;
 
     return <>{children}</>;
 }

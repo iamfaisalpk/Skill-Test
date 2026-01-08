@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
+import AuthInitializer from "./AuthInitializer"; // ← Add this import
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +32,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#161616] text-white min-h-screen flex flex-col`}
       >
+        {/* This initializes auth state from localStorage on every load */}
+        <AuthInitializer />
+
         {/* SSR Navbar */}
         <Navbar />
 
@@ -37,6 +43,20 @@ export default function RootLayout({
 
         {/* SSR Footer */}
         <Footer />
+
+        {/* Toast notifications */}
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+        />
       </body>
     </html>
   );
