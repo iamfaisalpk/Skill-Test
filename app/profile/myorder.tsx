@@ -62,7 +62,6 @@ export default function ProfilePage() {
                     apiOrders = response.data.orders;
                 }
 
-                // Only add orders that have selected_color
                 apiOrders.forEach((order) => {
                     if (order.selected_color) {
                         myOrders.push(order);
