@@ -1,4 +1,4 @@
-🚀 Skill Test – OTP Based E-Commerce Flow (Next.js)
+🚀 Skill Test – mini e-commerce application (Next.js)
 📌 Project Overview
 
 This project is a Next.js (App Router) based web application implementing an OTP-based authentication flow along with a product purchase and order management system.
