@@ -17,38 +17,48 @@ export default function NameInput({ phone }: NameInputProps) {
     const router = useRouter();
 
     const handleRegister = async () => {
-        if (!name) return toast.error("Enter your name");
+        if (!name.trim()) {
+            toast.error("Please enter your name");
+            return;
+        }
 
         setLoading(true);
         try {
             const res = await api.post("/api/login-register/", { name, phone_number: phone });
             login(res.data.token.access, name);
             toast.success("Registered successfully!");
-            router.push("/");
+            setTimeout(() => router.push("/"), 1000);
         } catch (err) {
-            console.error(err);
-            toast.error("Registration failed");
+            console.error("Registration error:", err);
+            toast.error("Registration failed. Please try again.");
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     return (
-        <>
-            <h2 className="text-xl font-bold mb-4">Welcome, You are?</h2>
-            <input
-                type="text"
-                placeholder="Eg. John Mathew"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full p-3 bg-gray-800 border border-gray-600 rounded mb-4 text-white"
-            />
-            <button
-                onClick={handleRegister}
-                disabled={loading}
-                className="w-full bg-white text-black py-3 rounded hover:bg-gray-200 transition cursor-pointer"
-            >
-                {loading ? "Registering..." : "Continue"}
-            </button>
-        </>
+        <div className="w-full min-h-screen bg-black flex flex-col justify-center items-center px-6">
+            <div className="w-full max-w-md">
+                <h2 className="text-2xl font-medium text-white text-center mb-8">Welcome, You are?</h2>
+
+                <label className="block text-white text-sm mb-3">Name</label>
+
+                <input
+                    type="text"
+                    placeholder="Eg: John Mathew"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-5 py-4 bg-zinc-900 text-white text-base rounded-xl mb-8 focus:outline-none focus:ring-1 focus:ring-gray-600 placeholder-gray-500"
+                />
+
+                <button
+                    onClick={handleRegister}
+                    disabled={loading || !name.trim()}
+                    className="w-full bg-white text-black cursor-pointer font-medium py-4 rounded-full disabled:bg-gray-700 disabled:text-gray-500 hover:bg-gray-100 transition-colors"
+                >
+                    {loading ? "Registering..." : "Continue"}
+                </button>
+            </div>
+        </div>
     );
 }

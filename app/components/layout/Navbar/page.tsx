@@ -1,9 +1,9 @@
-import ProfilePage from "./myorder";
+import Navbar from "./Navbar";
 
 const page = () => {
     return (
         <div>
-            <ProfilePage/>
+            <Navbar/>
         </div>
     );
 }

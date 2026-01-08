@@ -1,9 +1,9 @@
-import ProfilePage from "./myorder";
+import Footer from "./Footer";
 
 const page = () => {
     return (
         <div>
-            <ProfilePage/>
+            <Footer/>
         </div>
     );
 }

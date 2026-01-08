@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -10,9 +11,10 @@ interface OtpInputProps {
     phone: string;
     userExists: boolean;
     staticOtp: string;
+    onResend: () => void;
 }
 
-export default function OtpInput({ phone, userExists, staticOtp }: OtpInputProps) {
+export default function OtpInput({ phone, userExists, staticOtp, onResend }: OtpInputProps) {
     const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
     const [verified, setVerified] = useState(false);
     const [resendTimer, setResendTimer] = useState(30);
@@ -28,11 +30,10 @@ export default function OtpInput({ phone, userExists, staticOtp }: OtpInputProps
 
         if (userExists) {
             login("existing_user_jwt_token", "Existing User");
-            setTimeout(() => router.push("/"), 800);
+            setTimeout(() => router.push("/"), 1000);
         }
     }, [userExists, login, router]);
 
-    // Timer countdown
     useEffect(() => {
         intervalRef.current = setInterval(() => {
             setResendTimer((prev) => {
@@ -52,16 +53,14 @@ export default function OtpInput({ phone, userExists, staticOtp }: OtpInputProps
     const handleResend = useCallback(() => {
         if (!canResend) return;
 
-        const newOtp = Math.floor(1000 + Math.random() * 9000).toString();
-        toast.info(`New OTP for testing: ${newOtp}`);
+        onResend();
 
         setResendTimer(30);
         setCanResend(false);
         setOtp(["", "", "", ""]);
         inputsRef.current[0]?.focus();
-    }, [canResend]);
+    }, [canResend, onResend]);
 
-    // Auto-verify directly on input change — NO EFFECT!
     const handleChange = (value: string, index: number) => {
         if (!/^\d*$/.test(value)) return;
 
@@ -69,12 +68,10 @@ export default function OtpInput({ phone, userExists, staticOtp }: OtpInputProps
         newOtp[index] = value.slice(-1);
         setOtp(newOtp);
 
-        // Auto-focus next
         if (value && index < 3) {
             inputsRef.current[index + 1]?.focus();
         }
 
-        // Auto-verify when all 4 digits are filled
         if (newOtp.every(digit => digit !== "")) {
             const enteredOtp = newOtp.join("");
             if (enteredOtp === staticOtp) {
@@ -103,15 +100,17 @@ export default function OtpInput({ phone, userExists, staticOtp }: OtpInputProps
     };
 
     return (
-        <div className="w-full">
+        <div className="w-full min-h-screen bg-black flex flex-col justify-center items-center px-6">
             {!verified ? (
-                <>
-                    <h2 className="text-2xl font-bold mb-6 text-center">Verify phone</h2>
-                    <p className="text-center text-gray-300 mb-8">
-                        Enter the OTP sent to <span className="font-medium">{phone}</span>
+                <div className="w-full max-w-md">
+                    <h2 className="text-2xl font-medium text-white text-center mb-2">Verify phone</h2>
+                    <p className="text-gray-400 text-sm text-center mb-8">
+                        Enter the OTP sent to {phone}
                     </p>
 
-                    <div className="flex justify-center gap-3 mb-8">
+                    <label className="block text-white text-sm mb-3">Enter OTP</label>
+
+                    <div className="flex justify-center gap-3 mb-6">
                         {[0, 1, 2, 3].map((i) => (
                             <input
                                 key={i}
@@ -123,22 +122,22 @@ export default function OtpInput({ phone, userExists, staticOtp }: OtpInputProps
                                 value={otp[i]}
                                 onChange={(e) => handleChange(e.target.value, i)}
                                 onKeyDown={(e) => handleKeyDown(e, i)}
-                                className="w-14 h-14 bg-gray-800 text-white text-3xl text-center rounded-lg border border-gray-600 focus:border-white focus:outline-none transition"
+                                className="w-20 h-14 bg-zinc-900 text-white text-2xl text-center rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-600"
                                 autoFocus={i === 0}
                             />
                         ))}
                     </div>
 
-                    <div className="text-center mb-8">
+                    <div className="text-left mb-8">
                         {canResend ? (
                             <button
                                 onClick={handleResend}
-                                className="text-white underline hover:text-gray-300 transition"
+                                className="text-gray-400 cursor-pointer text-sm hover:text-gray-300"
                             >
                                 Resend OTP
                             </button>
                         ) : (
-                            <p className="text-gray-400">
+                            <p className="text-gray-400 text-sm cursor-pointer">
                                 Resend OTP in {resendTimer}s
                             </p>
                         )}
@@ -147,11 +146,11 @@ export default function OtpInput({ phone, userExists, staticOtp }: OtpInputProps
                     <button
                         onClick={handleManualVerify}
                         disabled={otp.some(digit => digit === "")}
-                        className="w-full bg-white text-black font-medium py-4 rounded-lg hover:bg-gray-100 disabled:bg-gray-600 disabled:text-gray-400 transition cursor-pointer"
+                        className="w-full bg-white cursor-pointer text-black font-medium py-4 rounded-full disabled:bg-gray-700 disabled:text-gray-500 hover:bg-gray-100 transition-colors"
                     >
                         Verify
                     </button>
-                </>
+                </div>
             ) : !userExists ? (
                 <NameInput phone={phone} />
             ) : null}
