@@ -13,19 +13,19 @@ interface Order {
     total_amount: number;
     original_price?: number;
     created_at: string;
-    selected_color?: "green" | "vilot" | "red" | "pink";
+    selected_color?: "green" | "vilot " | "red" | "pink";
 }
 
 const COLOR_IMAGES: Record<string, string> = {
     green: "/images/green.png",
-    vilot: "/images/vilot.png",
+    vilot : "/images/vilot.png", // keeping your filename as is
     red: "/images/red.png",
     pink: "/images/pink.png",
 };
 
 const COLOR_BG_CLASS: Record<string, string> = {
     green: "bg-lime-400",
-    vilot: "bg-purple-600",
+    vilot : "bg-purple-600",
     red: "bg-red-600",
     pink: "bg-pink-400",
 };
@@ -52,18 +52,18 @@ export default function ProfilePage() {
         const loadMyOrders = async () => {
             let myOrders: Order[] = [];
 
+            // Load local last order (most recent successful purchase)
             const lastOrderJson = localStorage.getItem("last_order");
             if (lastOrderJson) {
                 try {
                     const lastOrder = JSON.parse(lastOrderJson);
-                    if (lastOrder.selected_color) {
-                        myOrders.push(lastOrder);
-                    }
+                    myOrders.push(lastOrder); // Always add, no color check needed
                 } catch (e) {
                     console.error("Failed to parse last_order", e);
                 }
             }
 
+            // Load orders from API
             try {
                 const response = await api.get("/api/user-orders/");
                 let apiOrders: Order[] = [];
@@ -73,18 +73,20 @@ export default function ProfilePage() {
                     apiOrders = response.data.orders;
                 }
 
+                // Add API orders (skip duplicates by id)
                 apiOrders.forEach((order) => {
-                    if (order.selected_color && !myOrders.some((o) => o.id === order.id)) {
-                        myOrders.push(order);
+                    if (!myOrders.some((o) => o.id === order.id)) {
+                        myOrders.push(order); // Always add, no color check
                     }
                 });
             } catch {
                 console.log("API not available yet — showing local order only");
             }
 
+            // Filter out deleted orders (only for ones with id)
             const deletedIds = getDeletedIds();
             myOrders = myOrders.filter((order) => {
-                if (!order.id) return true;
+                if (!order.id) return true; // local orders without id are kept
                 return !deletedIds.includes(order.id);
             });
 
@@ -137,9 +139,10 @@ export default function ProfilePage() {
                 ) : (
                     <div className="space-y-6">
                         {orders.map((order, index) => {
+                            // Fallback to green if no color
                             const color = order.selected_color || "green";
-                            const shoeImage = COLOR_IMAGES[color];
-                            const bgCircleClass = COLOR_BG_CLASS[color];
+                            const shoeImage = COLOR_IMAGES[color] || COLOR_IMAGES.green;
+                            const bgCircleClass = COLOR_BG_CLASS[color] || COLOR_BG_CLASS.green;
 
                             const key = order.id || `local-${index}-${order.product_name}`;
 
@@ -200,7 +203,7 @@ export default function ProfilePage() {
                         <div className="mb-6 flex items-center gap-4">
                             <div className={`relative w-20 h-20 ${COLOR_BG_CLASS[orderToDelete.selected_color || "green"]} rounded-full overflow-hidden`}>
                                 <Image
-                                    src={COLOR_IMAGES[orderToDelete.selected_color || "green"]}
+                                    src={COLOR_IMAGES[orderToDelete.selected_color || "green"] || COLOR_IMAGES.green}
                                     alt={`${orderToDelete.product_name} preview`}
                                     width={150}
                                     height={150}
